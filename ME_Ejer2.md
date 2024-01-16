@@ -1,9 +1,9 @@
 # Ejercicio 2: Realizar las siguientes operacione en Elasticsearch utilizando su API REST.
 
-### Crear un índice “usuarios” con las siguientes características:
-### § Campo “nombre”, tipo text.
-### § Campo “apellido”, tipo text.
-### § Campo “edad”, tipo integer.
+#### Crear un índice “usuarios” con las siguientes características:
+#### § Campo “nombre”, tipo text.
+#### § Campo “apellido”, tipo text.
+#### § Campo “edad”, tipo integer.
 
 ```bash
 # Primero hacer esto:
