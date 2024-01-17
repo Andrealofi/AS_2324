@@ -1,0 +1,23 @@
+name: Primer workflow
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs: 
+  T5-Ejercicio1:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Instalar pytest
+        run: pip install pytest
+
+      - name: Ejecutar tests
+        run: pytest test.py
+    
+    
+    

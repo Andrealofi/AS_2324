@@ -1,0 +1,15 @@
+name: Segundo workflow
+
+on: push
+
+jobs:
+  Ejercicio_2:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+
+    steps:
+      - name: analizar calidad del codigo
+        uses: advanced-security/python-lint-code-scanning-action@v1
+        with:
+          linter: pylint

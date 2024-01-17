@@ -1,0 +1,16 @@
+name: Ejercicio 3
+
+on: pull_request
+
+jobs:
+  ejercicio3:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      
+    steps: 
+      - name: analisis del codigo
+        uses: advanced-security/python-lint-code-scanning-action@v1
+        with: 
+          linter: pylint
+        
