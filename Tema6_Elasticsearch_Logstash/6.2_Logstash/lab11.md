@@ -80,6 +80,8 @@ logger "Hola mundo"                             #Generamos un log
 
 curl -X GET "34.38.180.70:9200/logs-sistema/_search?pretty"
 
+# Si no aparece, podemos ver el archivo de logs aqui: var/log/syslog 
+
 ```
 
 ## Analisis de logs usando Beats:
