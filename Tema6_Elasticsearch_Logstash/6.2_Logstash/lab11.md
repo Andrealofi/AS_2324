@@ -1,4 +1,4 @@
-E# Laboratorio 11: Pila ELK
+# Laboratorio 11: Pila ELK
 
 ## Preparar el entorno:
 
@@ -15,7 +15,7 @@ docker compose up -d
 ##### Debemos hacer en Samples en Grook meter el coso que nos dan:  Dec 1 11:33:22 as-vm systemd[1]: systemd-tmpfiles-clean.service: Succeeded  y luego iremos poniendo cada etiqueta en Grok pattern para crear el "message" de abajo. (date cuenta de los espacios)
 
 ```bash
-$ nano longstash.conf
+$ nano logstash.conf
 
   GNU nano 6.2                                logstash.conf *                                        
 input{
