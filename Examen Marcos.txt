@@ -1,0 +1,153 @@
+################################################### ELASTICSEARCH ##########################################
+curl -O https://download.elastic.co/demos/kibana/gettingstarted/accounts.zip
+unzip accounts.zip
+a) Crear un índice "bank" e indexar los datos
+    curl -H "Content-Type: application/json" -XPUT 127.0.0.1:9200/bank
+b) Indexar los datos utilizando una carga en bruto 
+    curl -H "Content-Type: application/json" -XPUT '127.0.0.1:9200/bank/_bulk' --data-binary @accounts.json
+c) Obtener información "Documentos de un índice"
+    curl -XGET 127.0.0.1:9200/bank/_search?pretty
+    
+-Recuperar índices --> curl 127.0.0.1:9200/_cat/indices?v
+-Leer mapping de un índice --> curl -XGET 127.0.0.1:9200/nomIndex/_mapping
+-Nº de docs de un índice --> curl -XGET 127.0.0.1:9200/nombreIndex/_count?pretty
+-Documentos de un índice --> curl -XGET 127.0.0.1:9200/nombreIndex/_search?pretty
+
+-----------------------------------------------------------
+-Crear un índice --> curl -H "Content-Type: application/json" -XPUT 127.0.0.1:9200/nombreIndex
+-Crear un índice con campos --> curl -H "Content-Type: application/json" -XPUT '127.0.0.1:9200/libros -d '{"properties":{"libro":{"type":"text"},"autor":{"type":"text"}}}'
+-Añadir campos a un índice --> curl -H "Content-Type: application/json" -XPUT '127.0.0.1:9200/nombreIndex/_mapping?pretty' -d '{"properties":{"campoA":{"type":"text"},"campoB":{"type":"integer"}}}'
+Añadir documentos --> curl -H "Content-Type: application/json" -XPOST '127.0.0.1:9200/libros/_doc/1' -d '{"libro":"milibro", "autor":"marcos"}' 
+-Cargar un documento --> curl -H "Content-Type: application/json" -XPOST 127.0.0.1:9200/nombreIndex/_doc/ID --data-binary @name.json
+-Cargar varios documentos --> curl -H "Content-Type: application/json" -XPUT '127.0.0.1:9200/nombreIndex/_bulk' --data-binary @name.json
+-Modificar un documento -->curl -H "Content-Type: application/json" -XPOST '127.0.0.1:9200/libros/_update/1' -d '{"doc":{"libro":"cambio"}}'
+-Eliminar un documento --> curl -XDELETE '127.0.0.1:9200/nombreIndex/_doc/ID' 
+
+---------------------------------------
+
+-Cargar datos --> Crear un documento json (name.json): "luego bulk"
+	{"index":{"_id":"1"}}
+	{"campoA":"abc","campoB":10}
+	{"index":{"_id":"2"}}
+	{"campoA":"def","campoB":23}
+
+-------------------------------------------------------------
+-Buscar 3 resultados --> curl -H "Content-Type: application/json" -XGET '127.0.0.1:9200/alumnos/_search?pretty' -d '{"from":0,"size":3}'
+-Filtrar por nombre --> curl -H "Content-Type: application/json" -XGET '127.0.0.1:9200/alumnos/_search?pretty' -d '{"query":{"match":{"nom":"marco"}}}'
+-Ordenar por edad ascendente --> curl -H "Content-Type: application/json" -XGET '127.0.0.1:9200/alumnos/_search?pretty' -d '{"sort":[{"age":"asc"}}]}'
+ //desc
+-Pais X pero no Y ciudad --> curl -H "Content-Type: application/json" -XGET '127.0.0.1:9200/alumnos/_search?pretty' -d '{"query":{"bool":{"must":[{"match":{"nom":"marco"}}],"must_not":[{"match":{"age":"18"}}]}}}'
+-Buscar nombre Paco, como Pco --> curl -XGET "127.0.0.1:9200/bank/_search?pretty" -H 'Content-Type: application/json' -d '{
+        "query":{
+            "fuzzy":{
+                "city":{"value":"Woyming"}
+            }
+        }
+    }'
+-que empiece o termine por --> curl -H "Content-Type: application/json" -XGET '127.0.0.1:9200/bank/_search?pretty' -d '{
+> "query":{
+> "wildcard":{"lastname":{"value":"g*tes"}}
+> }}'    
+-busqueda lite (que contenga la palabra roja en titulo y anyo> 1950) -->
+curl -H "Content-Type: application/json" -XGET
+'127.0.0.1:9200/libros/_search?q=+anyo:>1950+titulo:roja
+    
+    
+-Más búsquedas:
+	-Filter --> Dentro de un bool
+	-Should --> Dentro de un filter, y dentro de otro bool dentro del filter --> [{}] "Se cumple una u otra"
+	-Match_phrase --> Como match pero para frases largas
+		-Variante --> "match_phrase":{"desc":{"query":"la casa es azul", "slop":2}} --> Consigue también la azul casa
+	-Multi_match --> "multi_match": {"query":"roja","fields":["campoA","campoB"]} --> "permite hacer la misma query en múltiples campos"
+	-Prefix --> Dentro del query
+	-Wildcard --> Dentro de query --> {"calle":"6*court"}
+	-Expresiones regulares "regexp": --> {"calle":"ab."} https://www.elastic.co/guide/en/elasticsearch/reference/current/regexp-syntax.html
+		- ab. --> 1 (cualquiera)
+		- a+b+ --> 1..*
+		- ab* --> 0..*
+		- ab? --> 0..1
+		- a{3}b --> 3
+		- a{2,4} --> 2..4
+		- a{2,} --> 2..
+		- | --> Or
+		- [abc] --> a o b o c
+		- [a-c] --> a o b o c
+		- [^abc] --> cualquiera menos a b o c
+
+paginación --> https://www.elastic.co/guide/en/elasticsearch/reference/current/paginate-search-results.html
+ordenación --> https://www.elastic.co/guide/en/elasticsearch/reference/current/sort-search-results.html
+filtros --> https://www.elastic.co/guide/en/elasticsearch/reference/current/filter-search-results.html
+busqueda difusa --> https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-fuzzy-query.html
+prefijos de búsqueda --> https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-prefix-query.html
+comodines --> https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-wildcard-query.html
+expresiones regulares --> https://www.elastic.co/guide/en/elasticsearch/reference/current/regexp-syntax.html
+			  https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-regexp-query.html
+
+
+############################################### LOGSTASH ###################################################33
+-mkdir logstash
+-cd logstash
+-vim docker-file.yml
+	services:
+	  elasticsearch:
+	    image: docker.elastic.co/elasticsearch/elasticsearch:8.5.1
+	    container_name: elasticsearch
+	    environment:
+	      - discovery.type=single-node
+	      - xpack.security.enabled=false
+	    volumes:
+	      - data01:/usr/share/elasticsearch/data
+	    ports:
+	      - 9200:9200
+	      - 9300:9300
+	  logstash:
+	    image: docker.elastic.co/logstash/logstash:8.5.1
+	    container_name: logstash
+	    volumes:
+	      - ./pipeline/usr/share/logstash/pipeline
+	    ports:
+	      - 9563:9563
+	    depends_on:
+	      - elasticsearch
+	volumes:
+	  data01:
+	  
+	  
+-vim logstash.conf
+	input{
+	  http{
+	    port => '9563'
+	  }
+	}
+	filter{
+	  json{
+	    source => "message"
+	    targer => "docu"
+	  }
+	  grok{match => {"message" => "%{...} %{...}"}}  ¡quitar el json de arriba!
+	}
+	output{
+	  stdout{}
+	  elasticseach{
+	    index => "nombreIndex"
+	  }
+	}
+-sudo docker compose up
+-curl 127.0.0.1:9563 -d 'Hola mundo'
+
+-Enviar objetos json al índice de elasticsearch --> curl 127.0.0.1:9563 -d {"campoA":"A","campoB":"B"}
+-Enviar objetos json al índice de elasticsearch --> curl 127.0.0.1:9900 -d  {json obtenido del grok}
+-Grok --> https://github.com/logstash-plugins/logstash-patterns-core/blob/main/patterns/ecs-v1/grok-patterns
+	  https://www.javainuse.com/grok
+-Eliminar datos (dentro de filter)--> mutate{remove_field => ["nombreCampoA","nombreCampoB"]}
+-Codición para no procesar objetos X (dentro de filter) --> if [campoA] == "X" {drop{}} 
+
+-input --> https://www.elastic.co/guide/en/logstash/current/input-plugins.html
+-filter --> https://www.elastic.co/guide/en/logstash/current/filter-plugins.html
+-output --> https://www.elastic.co/guide/en/logstash/current/output-plugins.html
+
+
+
+############################final del examen###############
+tar -zcvf pipeline.tar.gz pipeline 
+desde ordenador --> scp marcosguz@35.187.45.213:/home/marcosguz/miEntornoElastic/pipeline.tar.gz .
