@@ -1,9 +1,9 @@
 # Ejercicio 2
 
 ## Crear un indice "peliculas" con el siguiente mapping
-### Campo "titulo", tipo text
-### Campo "director", tipo text
-### Campo "año", tipo integer
+##### Campo "titulo", tipo text
+##### Campo "director", tipo text
+##### Campo "año", tipo integer
 
 ```bash
 curl -X PUT "localhost:9200/peliculas" -H 'Content-Type: application/json' -d'
