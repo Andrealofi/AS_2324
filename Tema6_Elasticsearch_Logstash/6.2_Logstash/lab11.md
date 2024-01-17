@@ -70,7 +70,8 @@ services:
 
 ```
 
-### Hay que modificar tambien los puerto TCP y UDP del Firewall al 9200 los dos para que aparezca.
+### Hay que abrir los puertos tambien desde Google Cloud creando una regla de Firewall nueva y añadiendo TCP, UCP al puerto 9200.
+
 ### Una vez tenemos tenemos todo modificado, tendremos que hacer lo siguiente: 
 ```bash
 docker compose up -d                            #Levantamos el contenedor de logstash
