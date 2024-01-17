@@ -1,0 +1,55 @@
+name: laboratorio8
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  laboratorio8:
+    runs-on: ubuntu-latest
+
+    steps: 
+      - name: descargar codigo
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DECKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./app
+          push: true
+          tags: andrealofi/as-laboratorio8-web:latest
+
+      - name: Login to Google Cloud
+        uses: google-github-actions/auth@v1
+        with: 
+          credentials_json: ${{ secrets.GOOGLECLOUD_TOKEN}}
+          project_id: ${{ secrets.KUBERNETESPROY_NAME}}
+
+      - name: Login to Kubernetes
+        uses: simenandre/setup-gke-gcloud-auth-plugin@v1
+
+      - name: Config kubectl
+        uses: google-github-actions/get-gke-credentials@v1
+        with: 
+          cluster_name: labo8_AS
+          location: us-central1
+
+      - name: Desplegar objetos Kubernetes
+        run: |
+          kubectl apply -f ./k8s/web-deployment.yaml
+          kubectl apply -f ./k8s/sgbd-deployment.yaml
+          kubectl apply -f ./k8s/web-service.yaml
+          kubectl apply -f ./k8s/sgbd-service.yaml
+          kubectl apply -f ./k8s/ingress.yaml
+          kubectl rollout restart deployment web-d
+          kubectl rollout restart deployment sgbd-d
+          
+          
+          
